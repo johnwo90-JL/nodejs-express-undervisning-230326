@@ -1,22 +1,21 @@
 import express from "express";
 
+import { useRequestId } from "./middleware/request-id.middleware.js";
+import { useLogging } from "./middleware/request-logger.middleware.js";
+import { serverConfig } from "./configs/server.config.js";
+import { rootRouter } from "./routers/root.router.js";
+import { userRouter } from "./routers/users.router.js";
 
-const app = express();
+export const app = express();
 
-/**
- * @param {express.Request} req - HTTP Request
- * @param {express.Response} res - HTTP Response
- * @param {express.NextFunction} [next] - Invoke next handler
- */
-const endpointHandler = (req, res, next) => { // <-- Request Handler
-    res.status(200).send("Hello, World!"); // 200 -> OK
-    console.log(JSON.stringify(req.rawHeaders));
-};
+app.use(useRequestId);
+app.use(useLogging)
 
-app.get("/", endpointHandler);
+app.use("/", rootRouter);
+app.use("/users", userRouter);
 
-const port = 3000;
-const host = "127.0.0.1"; // 127.0.0.1 <=> localhost
+
+const { port, host } = serverConfig;
 
 app.listen(port, host, (error) => {
     if (error?.name) {
