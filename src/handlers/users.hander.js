@@ -7,6 +7,7 @@ import { UsersPostValidationSchema } from "../schemas/users.schemas.js";
  * @param {express.NextFunction} [next] - Invoke next handler
  */
 export const usersGetHandler = (req, res, next) => { // <-- Request Handler
+    console.log(`[GET /users]: flag=${req.parsed.query.flag}`);
     res.status(200).send("Endpoint GET '/users' invoked"); // 200 -> OK
 };
 

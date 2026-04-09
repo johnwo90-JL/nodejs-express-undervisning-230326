@@ -2,7 +2,7 @@ import express from "express";
 
 import { usersGetHandler, usersPostHandler } from "../handlers/users.hander.js";
 import { UseValidation } from "../middleware/use-validation.middleware.js";
-import { UsersPostValidationSchema } from "../schemas/users.schemas.js";
+import { UsersGetValidationSchema, UsersPostValidationSchema } from "../schemas/users.schemas.js";
 
 
 
@@ -24,7 +24,7 @@ const UsersRouterErrorHandler = (err, req, res, next)  =>  {
 export const userRouter = express.Router();
 
 // /users/[...]
-userRouter.get("/", usersGetHandler);
+userRouter.get("/", UseValidation(UsersGetValidationSchema), usersGetHandler);
 userRouter.post("/:id", UseValidation(UsersPostValidationSchema), usersPostHandler);
 
 // Add error-handler **after** other endpoints.

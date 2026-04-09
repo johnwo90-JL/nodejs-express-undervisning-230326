@@ -14,4 +14,11 @@ export const UsersPostValidationSchema = z.object({
     params: z.object({
         id: z.coerce.number()
     }).optional(),
+});
+
+
+export const UsersGetValidationSchema = z.object({
+    query: z.object({
+        flag: z.coerce.number().min(100).max(1000),
+    })
 })
