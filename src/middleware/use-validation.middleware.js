@@ -10,6 +10,7 @@ export const UseValidation = (validationSchema) => {
         const result = await validationSchema.parseAsync(req);
         req.parsed = result;
                    
+        console.log("Validation Passed!");
         next();
     }
 }

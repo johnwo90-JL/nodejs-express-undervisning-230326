@@ -1,6 +1,6 @@
 import express from "express";
 
-import { endpointHandler } from "../handlers/root.handler.js";
+import { endpointHandler } from "../controllers/root.controller.js";
 
 export const rootRouter = express.Router();
 
