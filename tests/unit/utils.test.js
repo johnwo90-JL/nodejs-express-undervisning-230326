@@ -1,15 +1,15 @@
-import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
-import { appendCSV, readCSV, writeCSV } from "../../src/utils/test-utils.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { CSV_HEADER, appendCSV, deleteCSV, readCSV, writeCSV } from "../../src/utils/test-utils.js";
+import { randomUUID } from "node:crypto";
 
-const csvPath = "src/data/users.csv";
+const csvPath = `src/data/users.tmp${randomUUID()}.scratch.csv`;
 
 describe("Utility functions", () => {
-    // it("should return current working directory", () => {
-    //     expect(process.cwd()).toBeDefined();
-    // });
+    beforeAll(() => writeCSV(csvPath, []));
+    afterAll(() => deleteCSV(csvPath));
 
     it("should return the correct headers", () => {
-        expect(readCSV(csvPath).header).toBe("id,name,email,password,username");
+        expect(readCSV(csvPath).header).toBe(CSV_HEADER);
     });
 
     it("should append an entry to the CSV-file", () => {
@@ -24,5 +24,9 @@ describe("Utility functions", () => {
 
     it("should remove all elements from the CSV-file", () => {
         expect(() => writeCSV(csvPath, [])).not.toThrow();
+
+        const csvAfterWrite = readCSV(csvPath);
+        expect(csvAfterWrite.header).toBe(CSV_HEADER);
+        expect(csvAfterWrite.entries.length).toBe(0);
     });
 });

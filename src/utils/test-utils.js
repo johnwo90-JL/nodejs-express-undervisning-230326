@@ -1,5 +1,7 @@
 import fs from "node:fs";
 
+export const CSV_EOL = "\r\n";
+export const CSV_HEADER = "id,name,email,password,username";
 
 
 export function add(x, y) {
@@ -8,33 +10,44 @@ export function add(x, y) {
 
 
 export function readCSV(path, entriesKey = null) {
-    const content = fs.readFileSync(path).toString();
-    const lines = content.split("\r\n"); // \r = CR, \n = LF
-    const header = lines.shift();
+    const content = fs.existsSync(path) ? fs.readFileSync(path, "utf8") : CSV_HEADER+CSV_EOL
+    const lines = content.split(/\r?\n/);
+    const header = lines.shift() ?? "";
     const entries = lines;
 
-    return { header, [entriesKey ?? "entries"]: entries };
+    return { header, [entriesKey ?? "entries"]: entries.filter(e => e.length) };
 }
 
 
 export function appendCSV(path, entries) {
     if (!entries ||
-        !Array.isArray(entries) ||
-        entries.length === 0) {
+        !Array.isArray(entries)) {
         throw new Error("Invalid argument to parameter \"entries\".");
     }
 
-    fs.appendFile(path, entries.join("\r\n"), "utf-8", () => {});
+    if (entries.length === 0) {
+        return;
+    }
+
+    const currentContent = fs.readFileSync(path, "utf8");
+    const needsRecordSeparator = currentContent.length > 0 && !currentContent.endsWith("\n");
+    const contentToAppend = `${needsRecordSeparator ? CSV_EOL : ""}${entries.join(CSV_EOL)}${CSV_EOL}`;
+
+    fs.appendFileSync(path, contentToAppend, "utf8");
 }
 
 
 export function writeCSV(path, entries) {
-    // if (!entries || !Array.isArray(entries)) {
-    //     throw new Error("Invalid argument to parameter \"entries\".");
-    // }
+    if (!entries || !Array.isArray(entries)) {
+        throw new Error("Invalid argument to parameter \"entries\".");
+    }
 
     const data = readCSV(path);
-    console.log(data);
+    const body = entries.length ? `${entries.join(CSV_EOL)}${CSV_EOL}` : "";
 
-    fs.writeFile(path, data.header+"\r\n"+entries.join("\r\n"), 'utf8', () => {});
+    fs.writeFileSync(path, `${data.header ?? CSV_HEADER}${CSV_EOL}${body}`, "utf8");
+}
+
+export function deleteCSV(path) {
+    fs.unlinkSync(path);
 }
