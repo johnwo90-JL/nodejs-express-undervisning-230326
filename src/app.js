@@ -5,6 +5,7 @@ import { useLogging } from "./middleware/request-logger.middleware.js";
 import { serverConfig } from "./configs/server.config.js";
 import { rootRouter } from "./routers/root.router.js";
 import { userRouter } from "./routers/users.router.js";
+import { authRouter } from "./routers/auth.router.js";
 
 export const app = express();
 
@@ -15,8 +16,19 @@ app.use(useLogging)
 
 app.use("/", rootRouter);
 app.use("/users", userRouter);
+app.use("/auth", authRouter);
 
+
+// Global Error Handler
 app.use((err, req, res, next)  =>  {
+    if (err.name === "ZodError") {
+        console.error(err);
+        res.sendStatus(400) // Bad Request
+        return;
+    }
+
+    console.log(err);
+
      res.status(500).send("Reached app.js"); // Bad Request
 });
 
